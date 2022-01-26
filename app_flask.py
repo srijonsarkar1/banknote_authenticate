@@ -1,5 +1,6 @@
 import numpy as np
 from flask import Flask, request, jsonify, render_template
+from BankNotes import BankNote
 
 import pickle
 
@@ -25,7 +26,7 @@ def predict_banknote(data:BankNote):
     curtosis = data['curtosis']
     entropy = data['entropy']
 
-    prediction = classifier.predict([[variance, skewness, curtosis, entropy]])
+    prediction = model.predict([[variance, skewness, curtosis, entropy]])
 
     if prediction[0]>0.5:
         prediction = "Fake Note"
