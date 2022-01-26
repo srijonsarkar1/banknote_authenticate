@@ -10,8 +10,8 @@ model = pickle.load(open('classifier.pkl', 'rb'))
 
 @app.route('/')
 def home():
-    #return render_template('index.html')
-    return {'message' : 'Hello Oracle'}
+    return render_template('index.html')
+    #return {'message' : 'Hello Oracle'}
 
 @app.route('/predict', methods=['POST'])
 def predict_banknote(data:BankNote):
