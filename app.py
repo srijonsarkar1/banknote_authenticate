@@ -1,26 +1,24 @@
-import uvicorn
-from fastapi import FastAPI
-from BankNotes import BankNote
 import numpy as np
-import pandas as pd
+from flask import Flask, request, jsonify, render_template
+from BankNotes import BankNote
+
 import pickle
 
-app = FastAPI()
-classifier = pickle.load(open("classifier.pkl", "rb"))
+app = Flask(__name__)
 
+model = pickle.load(open('classifier.pkl', 'rb'))
 
-@app.get('/')
-def index():
-    return {'message' : 'Hello Oracle'}
-    
+@app.route('/')
+def home():
+    return render_template('index.html')
+    #return {'message' : 'Hello Oracle'}
 
-
-@app.get('/{name}')
-def get_name(name:str):
-    return  {'Welcome to Oracle MLOPS' :  f'{name}'}
-
-@app.post('/predict')
+@app.route('/predict', methods=['POST'])
 def predict_banknote(data:BankNote):
+    """
+        for rendering result on HTML GUI
+    """
+
     data = data.dict()
     print(data)
     variance = data['variance']
@@ -28,16 +26,16 @@ def predict_banknote(data:BankNote):
     curtosis = data['curtosis']
     entropy = data['entropy']
 
-    prediction = classifier.predict([[variance, skewness, curtosis, entropy]])
+    prediction = model.predict([[variance, skewness, curtosis, entropy]])
 
     if prediction[0]>0.5:
         prediction = "Fake Note"
     else:
         prediction = "Bank Note"
-    
-    return {
-        "prediction" : prediction
-    }
+
+    return render_template('index.html', prediction_text = f'Specified note is a {prediction}')
+
 
 if __name__=="__main__":
-    uvicorn.run(app, host='127.0.0.1', port=9000)
+    app.run(debug=True)
+    #main()
